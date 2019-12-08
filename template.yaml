@@ -1,12 +1,13 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: Template to create a DynamoDB table and an API for a todo list
-
+Parameters:
+  Table: {Default: todo, Type: String}
 Resources:
   TodoTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: todo
+      TableName: !Ref Table
       AttributeDefinitions:
         - AttributeName: todoId
           AttributeType: N
@@ -18,4 +19,72 @@ Resources:
         WriteCapacityUnits: 5
       SSESpecification:
         SSEEnabled: true
-    # TodoApi:
+  TodoApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionBody:
+        swagger: 2.0
+        info:
+          title:
+            Ref: AWS::StackName
+        paths:
+          "/todos":
+            get:
+              consumes:
+                - "application/json"
+              produces:
+                - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: AWS
+                uri: {"Fn::Sub": "arn:aws:apigateway:${AWS::Region}:dynamodb:action/Scan"}
+                credentials: { "Fn::Sub": "arn:aws:iam::537217846202:role/db-access"}
+                requestTemplates:
+                  application/json: {
+                    'Fn::Sub': "{ \"TableName\": \"${Table}\"}"
+                    }
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseTemplates:
+                        application/json: "#set ($todosRoot=$input.path('$')) { \"todos\": [ #foreach($todo in $todosRoot.Items) { \"todoId\": \"$todo.todoId.N\", \"title\": \"$todo.title.S\", \"status\": \"$todo.status.S\" } #if($foreach.hasNext),#end #end ] }"
+            post:
+              consumes:
+                - "application/json"
+              produces:
+                - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: AWS
+                uri: {"Fn::Sub": "arn:aws:apigateway:${AWS::Region}:dynamodb:action/UpdateItem"}
+                credentials: { "Fn::Sub": "arn:aws:iam::537217846202:role/db-access"}
+                requestTeimplates:
+                  application/json: {'Fn::Sub': "{ 
+                      \"TableName\": \"${Table}\", 
+                      \"Item\": { 
+                        \"todoId\": {
+                          \"N\": \"$input.path('$.todoId')\"
+                        }, 
+                        \"title\": {
+                          \"S\": \"$input.path('$.title')\"
+                        }, 
+                        \"status\": {
+                          \"S\": \"$input.path('$.status')\"
+                        }
+                      }
+                    }"
+                  }
+                responses:
+                  default:
+                    statusCode: "200"
