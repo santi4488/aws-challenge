@@ -79,8 +79,8 @@ Resources:
                     responseTemplates:
                       application/json: "#set ($todoRoot=$input.path('$.Attributes')) { \"todoId\": \"$todoRoot.todoId.N\", \"title\": \"$todoRoot.title.S\", \"status\": \"$todoRoot.status.S\" }"
                   "500":
-                    statusCode: "400"
-                  default:
+                    statusCode: "500"
+                  "400":
                     statusCode: "400"
           "/todos/{todoId}":
             put:
@@ -100,7 +100,27 @@ Resources:
                 credentials: { "Fn::Sub": "arn:aws:iam::537217846202:role/db-access"}
                 requestTemplates:
                   application/json:  { 
-                    'Fn::Sub': "{ \"TableName\": \"${Table}\", \"Key\": { \"todoId\": { \"N\": \"$input.path('$.todoId')\" } }, \"UpdateExpression\": \"set title = :val1, #s = :val2\", \"ExpressionAttributeNames\": { \"#s\": \"status\" }, \"ExpressionAttributeValues\": { \":val1\": { \"S\": \"$input.path('$.title')\" }, \":val2\": { \"S\": \"$input.path('$.status')\" } }, \"ReturnValues\": \"ALL_NEW\" }"
+                    'Fn::Sub': "{ \n\
+                    \t\"TableName\": \"${Table}\",\n\
+                    \t\"Key\": {\n\ 
+                    \t\t\"todoId\": {\n\
+                    \t\t\t\"N\": \"$input.path('$.todoId')\"\n\
+                    \t\t}\n\
+                    \t},\n\
+                    \t\"UpdateExpression\": \"set title = :val1, #s = :val2\",\n\
+                    \t\"ExpressionAttributeNames\": {\n\
+                    \t\t\"#s\": \"status\"\n\
+                    \t},\n\
+                    \t\"ExpressionAttributeValues\": {\n\
+                    \t\t\":val1\": {\n\
+                    \t\t\t\"S\": \"$input.path('$.title')\"\n\
+                    \t\t},\n\
+                    \t\t\":val2\": {\n\
+                    \t\t\t\"S\": \"$input.path('$.status')\"\n\
+                    \t\t}\n\
+                    \t},\n\
+                    \t\"ReturnValues\": \"ALL_NEW\"\n\
+                    }"
                   }
                 responses:
                   "200":
@@ -108,7 +128,7 @@ Resources:
                     responseTemplates:
                       application/json: "#set ($todoRoot=$input.path('$.Attributes')) { \"todoId\": \"$todoRoot.todoId.N\", \"title\": \"$todoRoot.title.S\", \"status\": \"$todoRoot.status.S\" }"
                   "500":
-                    statusCode: "400"
+                    statusCode: "500"
                   default:
                     statusCode: "400"
             delete:
