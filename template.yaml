@@ -30,6 +30,45 @@ Resources:
             Ref: AWS::StackName
         paths:
           "/todos":
+            options:
+              summary: CORS support
+              description: Enable CORS by returning correct headers
+              consumes:
+                - application/json
+              produces:
+                - application/json
+              tags:
+                - CORS
+              x-amazon-apigateway-integration:
+                type: MOCK
+                requestTemplates:
+                  application/json: |
+                    {
+                      "statusCode": 200
+                    }
+                responses:
+                  "default":
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.X-Requested-With: "'*'"
+                      method.response.header.Access-Control-Allow-Methods: "'POST,GET,OPTIONS,PUT,DELETE'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-requested-with'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                    responseTemplates:
+                      application/json: |
+                        {}
+              responses:
+                "200":
+                  description: Default response for CORS method
+                  headers:
+                    X-Requested-With:
+                      type: string
+                    Access-Control-Allow-Origin:
+                      type: string
+                    Access-Control-Allow-Methods:
+                      type: string
+                    Access-Control-Allow-Headers:
+                      type: string
             get:
               consumes:
                 - "application/json"
@@ -38,8 +77,46 @@ Resources:
               responses:
                 "200":
                   description: "200 response"
+                  headers:
+                    X-Requested-With:
+                      type: string
+                    Access-Control-Allow-Headers:
+                      type: string
+                    Access-Control-Allow-Methods:
+                      type: string
+                    Access-Control-Allow-Origin:
+                      type: string
+                      description: URI that may access the resource
                   schema:
                     $ref: "#/definitions/Empty"
+                "400":
+                  headers:
+                    X-Requested-With:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Headers:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Methods:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Origin:
+                      type: string
+                      description: URI that may access the resource
+                "500":
+                  headers:
+                    X-Requested-With:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Headers:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Methods:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Origin:
+                      type: string
+                      description: URI that may access the resource
               x-amazon-apigateway-integration:
                 httpMethod: POST
                 type: AWS
@@ -50,10 +127,29 @@ Resources:
                     'Fn::Sub': "{ \"TableName\": \"${Table}\"}"
                     }
                 responses:
-                  default:
+                  "200":
                     statusCode: "200"
+                    responseParameters:
+                      method.response.header.X-Requested-With: "'*'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-requested-with'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                      method.response.header.Access-Control-Allow-Methods: "'POST,GET,OPTIONS,PUT,DELETE'"
                     responseTemplates:
                         application/json: "#set ($todosRoot=$input.path('$')) { \"todos\": [ #foreach($todo in $todosRoot.Items) { \"todoId\": \"$todo.todoId.N\", \"title\": \"$todo.title.S\", \"status\": \"$todo.status.S\" } #if($foreach.hasNext),#end #end ] }"
+                  "500":
+                    statusCode: "500"
+                    responseParameters:
+                      method.response.header.X-Requested-With: "'*'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-requested-with'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                      method.response.header.Access-Control-Allow-Methods: "'POST,GET,OPTIONS,PUT,DELETE'"
+                  "400":
+                    statusCode: "400"
+                    responseParameters:
+                      method.response.header.X-Requested-With: "'*'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-requested-with'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                      method.response.header.Access-Control-Allow-Methods: "'POST,GET,OPTIONS,PUT,DELETE'"
             post:
               consumes:
                 - "application/json"
@@ -62,8 +158,46 @@ Resources:
               responses:
                 "200":
                   description: "200 response"
+                  headers:
+                    X-Requested-With:
+                      type: string
+                    Access-Control-Allow-Headers:
+                      type: string
+                    Access-Control-Allow-Methods:
+                      type: string
+                    Access-Control-Allow-Origin:
+                      type: string
+                      description: URI that may access the resource
                   schema:
                     $ref: "#/definitions/Empty"
+                "400":
+                  headers:
+                    X-Requested-With:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Headers:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Methods:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Origin:
+                      type: string
+                      description: URI that may access the resource
+                "500":
+                  headers:
+                    X-Requested-With:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Headers:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Methods:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Origin:
+                      type: string
+                      description: URI that may access the resource
               x-amazon-apigateway-integration:
                 httpMethod: POST
                 type: AWS
@@ -76,13 +210,67 @@ Resources:
                 responses:
                   "200":
                     statusCode: "200"
+                    responseParameters:
+                      method.response.header.X-Requested-With: "'*'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-requested-with'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                      method.response.header.Access-Control-Allow-Methods: "'POST,GET,OPTIONS,PUT,DELETE'"
                     responseTemplates:
                       application/json: "#set ($todoRoot=$input.path('$.Attributes')) { \"todoId\": \"$todoRoot.todoId.N\", \"title\": \"$todoRoot.title.S\", \"status\": \"$todoRoot.status.S\" }"
                   "500":
                     statusCode: "500"
+                    responseParameters:
+                      method.response.header.X-Requested-With: "'*'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-requested-with'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                      method.response.header.Access-Control-Allow-Methods: "'POST,GET,OPTIONS,PUT,DELETE'"
                   "400":
                     statusCode: "400"
+                    responseParameters:
+                      method.response.header.X-Requested-With: "'*'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-requested-with'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                      method.response.header.Access-Control-Allow-Methods: "'POST,GET,OPTIONS,PUT,DELETE'"
           "/todos/{todoId}":
+            options:
+              summary: CORS support
+              description: Enable CORS by returning correct headers
+              consumes:
+                - application/json
+              produces:
+                - application/json
+              tags:
+                - CORS
+              x-amazon-apigateway-integration:
+                type: MOCK
+                requestTemplates:
+                  application/json: |
+                    {
+                      "statusCode": 200
+                    }
+                responses:
+                  "default":
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.X-Requested-With: "'*'"
+                      method.response.header.Access-Control-Allow-Methods: "'POST,GET,OPTIONS,PUT,DELETE'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-requested-with'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                    responseTemplates:
+                      application/json: |
+                        {}
+              responses:
+                "200":
+                  description: Default response for CORS method
+                  headers:
+                    X-Requested-With:
+                      type: string
+                    Access-Control-Allow-Origin:
+                      type: string
+                    Access-Control-Allow-Methods:
+                      type: string
+                    Access-Control-Allow-Headers:
+                      type: string
             put:
               consumes:
                 - "application/json"
@@ -91,8 +279,46 @@ Resources:
               responses:
                 "200":
                   description: "200 response"
+                  headers:
+                    X-Requested-With:
+                      type: string
+                    Access-Control-Allow-Headers:
+                      type: string
+                    Access-Control-Allow-Methods:
+                      type: string
+                    Access-Control-Allow-Origin:
+                      type: string
+                      description: URI that may access the resource
                   schema:
-                    $ref: "#/definitions/schema"
+                    $ref: "#/definitions/Empty"
+                "400":
+                  headers:
+                    X-Requested-With:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Headers:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Methods:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Origin:
+                      type: string
+                      description: URI that may access the resource
+                "500":
+                  headers:
+                    X-Requested-With:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Headers:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Methods:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Origin:
+                      type: string
+                      description: URI that may access the resource
               x-amazon-apigateway-integration:
                 httpMethod: POST
                 type: AWS
@@ -125,12 +351,27 @@ Resources:
                 responses:
                   "200":
                     statusCode: "200"
+                    responseParameters:
+                      method.response.header.X-Requested-With: "'*'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-requested-with'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                      method.response.header.Access-Control-Allow-Methods: "'POST,GET,OPTIONS,PUT,DELETE'"
                     responseTemplates:
                       application/json: "#set ($todoRoot=$input.path('$.Attributes')) { \"todoId\": \"$todoRoot.todoId.N\", \"title\": \"$todoRoot.title.S\", \"status\": \"$todoRoot.status.S\" }"
                   "500":
                     statusCode: "500"
-                  default:
+                    responseParameters:
+                      method.response.header.X-Requested-With: "'*'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-requested-with'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                      method.response.header.Access-Control-Allow-Methods: "'POST,GET,OPTIONS,PUT,DELETE'"
+                  "400":
                     statusCode: "400"
+                    responseParameters:
+                      method.response.header.X-Requested-With: "'*'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-requested-with'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                      method.response.header.Access-Control-Allow-Methods: "'POST,GET,OPTIONS,PUT,DELETE'"
             delete:
               consumes:
                 - "application/json"
@@ -144,8 +385,46 @@ Resources:
               responses:
                 "200":
                   description: "200 response"
+                  headers:
+                    X-Requested-With:
+                      type: string
+                    Access-Control-Allow-Headers:
+                      type: string
+                    Access-Control-Allow-Methods:
+                      type: string
+                    Access-Control-Allow-Origin:
+                      type: string
+                      description: URI that may access the resource
                   schema:
-                    $ref: "#/definitions/Emtpy"
+                    $ref: "#/definitions/Empty"
+                "400":
+                  headers:
+                    X-Requested-With:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Headers:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Methods:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Origin:
+                      type: string
+                      description: URI that may access the resource
+                "500":
+                  headers:
+                    X-Requested-With:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Headers:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Methods:
+                      type: string
+                      description: Cors support
+                    Access-Control-Allow-Origin:
+                      type: string
+                      description: URI that may access the resource
               x-amazon-apigateway-integration:
                 httpMethod: POST
                 type: AWS
@@ -162,5 +441,24 @@ Resources:
                       \t}\n}" 
                     }
                 responses:
-                  default:
+                  "200":
                     statusCode: "200"
+                    responseParameters:
+                      method.response.header.X-Requested-With: "'*'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-requested-with'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                      method.response.header.Access-Control-Allow-Methods: "'POST,GET,OPTIONS,PUT,DELETE'"
+                  "500":
+                    statusCode: "500"
+                    responseParameters:
+                      method.response.header.X-Requested-With: "'*'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-requested-with'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                      method.response.header.Access-Control-Allow-Methods: "'POST,GET,OPTIONS,PUT,DELETE'"
+                  "400":
+                    statusCode: "400"
+                    responseParameters:
+                      method.response.header.X-Requested-With: "'*'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-requested-with'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                      method.response.header.Access-Control-Allow-Methods: "'POST,GET,OPTIONS,PUT,DELETE'"
