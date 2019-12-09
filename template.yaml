@@ -330,7 +330,7 @@ Resources:
                     \t\"TableName\": \"${Table}\",\n\
                     \t\"Key\": {\n\ 
                     \t\t\"todoId\": {\n\
-                    \t\t\t\"N\": \"$input.path('$.todoId')\"\n\
+                    \t\t\t\"N\": \"$input.params('todoId')\"\n\
                     \t\t}\n\
                     \t},\n\
                     \t\"UpdateExpression\": \"set title = :val1, #s = :val2\",\n\
