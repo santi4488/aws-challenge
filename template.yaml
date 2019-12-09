@@ -69,22 +69,78 @@ Resources:
                 type: AWS
                 uri: {"Fn::Sub": "arn:aws:apigateway:${AWS::Region}:dynamodb:action/UpdateItem"}
                 credentials: { "Fn::Sub": "arn:aws:iam::537217846202:role/db-access"}
-                requestTeimplates:
-                  application/json: {'Fn::Sub': "{ 
-                      \"TableName\": \"${Table}\", 
-                      \"Item\": { 
-                        \"todoId\": {
-                          \"N\": \"$input.path('$.todoId')\"
-                        }, 
-                        \"title\": {
-                          \"S\": \"$input.path('$.title')\"
-                        }, 
-                        \"status\": {
-                          \"S\": \"$input.path('$.status')\"
-                        }
-                      }
-                    }"
+                requestTemplates:
+                  application/json: {
+                    'Fn::Sub': "{ \"TableName\": \"${Table}\", \"Key\": { \"todoId\": \"{ \"N\": \"$input.path('$.todoId')\" } }, \"UpdateExpression\": \"set title = :val1, #s = :val2\", \"ExpressionAttributeNames\": { \"#s\": \"status\" }, \"ExpressionAttributeValues\": { \":val1\": { \"S\": \"$input.path('$.title')\" }, \":val2\": { \"S\": \"$input.path('$.status')\" } }, \"ReturnValues\": \"ALL_NEW\" }"
+                    }
+                responses:
+                  "200":
+                    statusCode: "200"
+                    responseTemplates:
+                      application/json: "#set ($todoRoot=$input.path('$.Attributes')) { \"todoId\": \"$todoRoot.todoId.N\", \"title\": \"$todoRoot.title.S\", \"status\": \"$todoRoot.status.S\" }"
+                  "500":
+                    statusCode: "400"
+                  default:
+                    statusCode: "400"
+          "/todos/{todoId}":
+            put:
+              consumes:
+                - "application/json"
+              produces:
+                - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/schema"
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: AWS
+                uri: { "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:dynamodb:action/UpdateItem"}
+                credentials: { "Fn::Sub": "arn:aws:iam::537217846202:role/db-access"}
+                requestTemplates:
+                  application/json:  { 
+                    'Fn::Sub': "{ \"TableName\": \"${Table}\", \"Key\": { \"todoId\": \"{ \"N\": \"$input.path('$.todoId')\" } }, \"UpdateExpression\": \"set title = :val1, #s = :val2\", \"ExpressionAttributeNames\": { \"#s\": \"status\" }, \"ExpressionAttributeValues\": { \":val1\": { \"S\": \"$input.path('$.title')\" }, \":val2\": { \"S\": \"$input.path('$.status')\" } }, \"ReturnValues\": \"ALL_NEW\" }"
                   }
+                responses:
+                  "200":
+                    statusCode: "200"
+                    responseTemplates:
+                      application/json: "#set ($todoRoot=$input.path('$.Attributes')) { \"todoId\": \"$todoRoot.todoId.N\", \"title\": \"$todoRoot.title.S\", \"status\": \"$todoRoot.status.S\" }"
+                  "500":
+                    statusCode: "400"
+                  default:
+                    statusCode: "400"
+            delete:
+              consumes:
+                - "application/json"
+              produces:
+                - "application/json"
+              parameters:
+                - name: "todoId"
+                  in: "path"
+                  required: true
+                  type: "string"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Emtpy"
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: AWS
+                uri: { "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:dynamodb:action/DeleteItem" }
+                credentials: { "Fn::Sub": "arn:aws:iam::537217846202:role/db-access"}
+                requestTemplates:
+                  application/json:  { 
+                    'Fn::Sub': "{ \n\
+                      \t\"TableName\": \"${Table}\",\n\
+                      \t\"Key\": {\n\
+                      \t\t\"todoId\": {\n
+                      \t\t\t\"N\": \"$input.params('todoId')\"\n\
+                      \t\t}\n\
+                      \t}\n}" 
+                    }
                 responses:
                   default:
                     statusCode: "200"
