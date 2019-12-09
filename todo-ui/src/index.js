@@ -13,7 +13,7 @@ class TodoApp extends React.Component {
       todo: [],
       done: []
     };
-    this.apiUrl = 'https://w9lrq492i0.execute-api.us-east-2.amazonaws.com/Stage';
+    this.apiUrl = 'https://dh7moujng3.execute-api.us-east-2.amazonaws.com/DEV';
   }
 
   componentDidMount() {
