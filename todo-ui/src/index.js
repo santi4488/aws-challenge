@@ -4,11 +4,16 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import { TodoForm } from "./TodoForm";
 import { TodoList } from './TodoList/todo-list';
+import { Alert } from './Alert';
 
 class TodoApp extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
+      alert: {
+        message: null,
+        type: null
+      },
       items: [],
       todo: [],
       done: []
@@ -52,10 +57,22 @@ class TodoApp extends React.Component {
         status: 'todo'
       })
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 200) {
+          return res.json();
+        }
+        return res.json()
+          .then((err) => {
+            return Promise.reject(err);
+          });
+      })
       .then((newItem) => {
         this.setState({
           ...this.state,
+          alert: {
+            message: `${newTodo} added successfully`,
+            type: 'success'
+          },
           items: [
             ...this.state.items,
             newItem
@@ -65,9 +82,32 @@ class TodoApp extends React.Component {
             newItem
           ]
         });
+        setTimeout(() => {
+          this.setState({
+            ...this.state,
+            alert: {
+              message: null
+            }
+          });
+        }, 3000)
       })
       .catch((err) => {
         console.error(err);
+        this.setState({
+          ...this.state,
+          alert: {
+            message: err.message,
+            type: 'error'
+          }
+        });
+        setTimeout(() => {
+          this.setState({
+            ...this.state,
+            alert: {
+              message: null
+            }
+          });
+        }, 3000)
       })
   }
 
@@ -84,9 +124,22 @@ class TodoApp extends React.Component {
         title: todo.title,
         status: 'done'
       })
-    }).then((res) => res.json())
+    }).then((res) => {
+      if (res.status === 200) {
+        return res.json();
+      }
+      return res.json()
+        .then((err) => {
+          return Promise.reject(err);
+        });
+    })
     .then((item) => {
+      console.log(item)
       this.setState({
+        alert: {
+          message: `${item.title} updated successfully`,
+          type: 'success'
+        },
         todo: this.state.todo.filter((t) => {
           return t.todoId !== id;
         }),
@@ -97,11 +150,31 @@ class TodoApp extends React.Component {
           })
         ]
       });
-    }, (err) => {
-      console.error(err);
+      setTimeout(() => {
+        this.setState({
+          ...this.state,
+          alert: {
+            message: null
+          }
+        });
+      }, 3000)
     })
     .catch((err) => {
-      console.error(err);
+      this.setState({
+        ...this.state,
+        alert: {
+          message: err.message,
+          type: 'error'
+        }
+      });
+      setTimeout(() => {
+        this.setState({
+          ...this.state,
+          alert: {
+            message: null
+          }
+        });
+      }, 3000)
     });
   }
 
@@ -110,8 +183,21 @@ class TodoApp extends React.Component {
       method: 'DELETE'
     })
     .then((res) => {
+      if (res.status === 200) {
+        return res.json();
+      }
+      return res.json()
+        .then((err) => {
+          return Promise.reject(err);
+        });
+    })
+    .then((res) => {
       this.setState({
         ...this.state,
+        alert: {
+          message: 'Item deleted successfully',
+          type: 'success'
+        },
         items: this.state.items.filter((item) => {
           return item.todoId !== id;
         }),
@@ -119,9 +205,31 @@ class TodoApp extends React.Component {
           return item.todoId !== id;
         })
       });
+      setTimeout(() => {
+        this.setState({
+          ...this.state,
+          alert: {
+            message: null
+          }
+        });
+      }, 3000);
     })
     .catch((err) => {
-      console.error(err);
+      this.setState({
+        ...this.state,
+        alert: {
+          message: err.message,
+          type: 'error'
+        }
+      });
+      setTimeout(() => {
+        this.setState({
+          ...this.state,
+          alert: {
+            message: null
+          }
+        });
+      }, 3000);
     });
   }
 
@@ -130,6 +238,7 @@ class TodoApp extends React.Component {
       <div className="container">
         <h1>My Todo List</h1>
         <hr/>
+        <Alert message={this.state.alert.message} type={this.state.alert.type}/>
         <TodoForm addTodo={this.addTodo.bind(this)}/>
         <div className="row">
           <div className="col-sm">
