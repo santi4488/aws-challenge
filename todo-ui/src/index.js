@@ -18,7 +18,7 @@ class TodoApp extends React.Component {
       todo: [],
       done: []
     };
-    this.apiUrl = 'https://dh7moujng3.execute-api.us-east-2.amazonaws.com/DEV';
+    this.apiUrl = ''; // your aws base url goes here
   }
 
   componentDidMount() {
