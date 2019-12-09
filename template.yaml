@@ -71,7 +71,7 @@ Resources:
                 credentials: { "Fn::Sub": "arn:aws:iam::537217846202:role/db-access"}
                 requestTemplates:
                   application/json: {
-                    'Fn::Sub': "{ \"TableName\": \"${Table}\", \"Key\": { \"todoId\": \"{ \"N\": \"$input.path('$.todoId')\" } }, \"UpdateExpression\": \"set title = :val1, #s = :val2\", \"ExpressionAttributeNames\": { \"#s\": \"status\" }, \"ExpressionAttributeValues\": { \":val1\": { \"S\": \"$input.path('$.title')\" }, \":val2\": { \"S\": \"$input.path('$.status')\" } }, \"ReturnValues\": \"ALL_NEW\" }"
+                    'Fn::Sub': "{ \"TableName\": \"${Table}\", \"Key\": { \"todoId\": { \"N\": \"$input.path('$.todoId')\" } }, \"UpdateExpression\": \"set title = :val1, #s = :val2\", \"ExpressionAttributeNames\": { \"#s\": \"status\" }, \"ExpressionAttributeValues\": { \":val1\": { \"S\": \"$input.path('$.title')\" }, \":val2\": { \"S\": \"$input.path('$.status')\" } }, \"ReturnValues\": \"ALL_NEW\" }"
                     }
                 responses:
                   "200":
@@ -100,7 +100,7 @@ Resources:
                 credentials: { "Fn::Sub": "arn:aws:iam::537217846202:role/db-access"}
                 requestTemplates:
                   application/json:  { 
-                    'Fn::Sub': "{ \"TableName\": \"${Table}\", \"Key\": { \"todoId\": \"{ \"N\": \"$input.path('$.todoId')\" } }, \"UpdateExpression\": \"set title = :val1, #s = :val2\", \"ExpressionAttributeNames\": { \"#s\": \"status\" }, \"ExpressionAttributeValues\": { \":val1\": { \"S\": \"$input.path('$.title')\" }, \":val2\": { \"S\": \"$input.path('$.status')\" } }, \"ReturnValues\": \"ALL_NEW\" }"
+                    'Fn::Sub': "{ \"TableName\": \"${Table}\", \"Key\": { \"todoId\": { \"N\": \"$input.path('$.todoId')\" } }, \"UpdateExpression\": \"set title = :val1, #s = :val2\", \"ExpressionAttributeNames\": { \"#s\": \"status\" }, \"ExpressionAttributeValues\": { \":val1\": { \"S\": \"$input.path('$.title')\" }, \":val2\": { \"S\": \"$input.path('$.status')\" } }, \"ReturnValues\": \"ALL_NEW\" }"
                   }
                 responses:
                   "200":
